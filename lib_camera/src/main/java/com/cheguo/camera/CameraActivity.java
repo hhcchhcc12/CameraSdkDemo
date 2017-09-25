@@ -29,13 +29,16 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
 import com.cheguo.camera.helper.PermissionUtils;
+import com.cheguo.camera.view.CameraUtil;
 import com.cheguo.camera.view.CameraView;
 import com.cheguo.camera.view.FocusImageView;
 import com.cheguo.camera.view.ICamera;
+import com.cheguo.camera.view.ISOSeekBarPopwindow;
+import com.cheguo.camera.view.SeekBarParams;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -50,15 +53,16 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 	private ScrollView scrollView;
 	private ListView photoListview;
 	private CameraPhotosAdapter adapter;
-
 	private ArrayList<String> listPath = new ArrayList<>();// 存放路径的list
-	private ArrayList<String> listImage = new ArrayList<>();// 存放图片的list
 
+	private ArrayList<String> listImage = new ArrayList<>();// 存放图片的list
 	private Button takepicture;
+
 	private Button flash;
 	private Button cancel;
 	private Button confirm;
 	private Button changeCamera;
+	private Button isoBtn;
 
 	ExecutorService fixedThreadPool;
 
@@ -67,6 +71,8 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 	SeekBar zoomBar;
 	LinearLayout zoomBarLayout;
 	private int flashStatus;
+	SeekBarParams seekBarParams;
+	ISOSeekBarPopwindow isoSeekBarPopwindow;
 
 	byte[] data;
 	int degree;
@@ -77,9 +83,19 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 
 	public final static String PARAMS_IMAGE_LIST = "PARAMS_IMAGE_LIST";
 	public final static String PARAMS_IMAGE_TYPE = "PARAMS_IMAGE_TYPE";
-	public final static String PARAMS_IMAGE_BEAN = "PARAMS_IMAGE_BEAN";
-	public final static String PARAMS_TITLE = "PARAMS_TITLE";
+	public final static String PARAMS_IMAGE_WIDTH = "PARAMS_IMAGE_WIDTH";
+	public final static String PARAMS_IMAGE_HEIGHT = "PARAMS_IMAGE_HEIGHT";
+	public final static String PARAMS_CALLBACK = "PARAMS_CALLBACK";
+	public final static String PARAMS_RESULTCODE = "PARAMS_RESULTCODE";
 
+	private final int DEFAULT_IMAGE_WIDTH = 1440;
+	private final int DEFAULT_IMAGE_HEIGHT = 2560;
+
+	private int IMAGE_WIDTH = DEFAULT_IMAGE_WIDTH;
+	private int IMAGE_HEIGHT = DEFAULT_IMAGE_HEIGHT;
+
+	private int resultCode;
+	private ImageCallback imageCallback;
 
 	//使用相机需要的权限
 	private final String[] PERMISSIONS = new String[]{Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE
@@ -87,6 +103,20 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 
 	// 打开相机请求Code，多个权限请求Code
 	private final int REQUEST_CODE_PERMISSIONS=1;
+
+	public static void launch(Activity context,int width,int height,int resultCode,ImageCallback imageCallback){
+		Intent intent = new Intent(context,CameraActivity.class);
+		intent.putExtra(PARAMS_IMAGE_WIDTH,width);
+		intent.putExtra(PARAMS_IMAGE_HEIGHT,height);
+		intent.putExtra(PARAMS_RESULTCODE,resultCode);
+		intent.putExtra(PARAMS_CALLBACK,imageCallback);
+		context.startActivityForResult(intent,resultCode);
+
+	}
+
+	public interface ImageCallback extends Serializable {
+		void setImagePaths(ArrayList<String> listImage);
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -176,6 +206,7 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 		cancel = (Button) findViewById(R.id.cancel);
 		confirm = (Button) findViewById(R.id.confirm);
 		cancel.setVisibility(View.GONE);
+		isoBtn = (Button) findViewById(R.id.iso_btn);
 
 		zoomBar =(SeekBar) findViewById(R.id.seek_bar);
 		zoomBarLayout = (LinearLayout) findViewById(R.id.seek_bar_layout);
@@ -191,9 +222,11 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 		photoListview.setOnItemClickListener(this);
 
 		takepicture.setOnClickListener(this);
-		flash.setOnClickListener(this );
-		cancel.setOnClickListener(this );
-		confirm.setOnClickListener(this );
+		flash.setOnClickListener(this);
+		cancel.setOnClickListener(this);
+		confirm.setOnClickListener(this);
+
+		isoBtn.setOnClickListener(this);
 
 		bindMenuListener();
 
@@ -202,6 +235,16 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 	private void initData(Bundle savedInstanceState){
 		fixedThreadPool = Executors.newFixedThreadPool(1);
 		imageType = getIntent().getStringExtra(PARAMS_IMAGE_TYPE);
+		if(getIntent().hasExtra(PARAMS_IMAGE_WIDTH)){
+			IMAGE_WIDTH = getIntent().getIntExtra(PARAMS_IMAGE_WIDTH,0) > 0 ?
+					getIntent().getIntExtra(PARAMS_IMAGE_WIDTH,0) : DEFAULT_IMAGE_WIDTH;
+		}
+		if(getIntent().hasExtra(PARAMS_IMAGE_WIDTH)){
+			IMAGE_HEIGHT = getIntent().getIntExtra(PARAMS_IMAGE_HEIGHT,0) > 0 ?
+					getIntent().getIntExtra(PARAMS_IMAGE_HEIGHT,0) : DEFAULT_IMAGE_HEIGHT;
+		}
+		resultCode = getIntent().getIntExtra(PARAMS_RESULTCODE,0);
+		imageCallback = (ImageCallback) getIntent().getSerializableExtra(PARAMS_CALLBACK);
 
 		if (savedInstanceState != null
 				&& savedInstanceState.getStringArrayList("path_list") != null){
@@ -317,7 +360,16 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 
 
 	public void setSeekBar(int min,int max,int cur){
-		initSeekBar(min,max,cur);
+		seekBarParams = new SeekBarParams(min,max,cur);
+		isoSeekBarPopwindow = new ISOSeekBarPopwindow(this, seekBarParams, new ISOSeekBarPopwindow.SeekCallback() {
+			@Override
+			public void progressChanged(int exposure) {
+				cameraView.setCustomExposureCompensation(exposure);
+				cameraView.focus(null);
+			}
+		});
+
+		//initSeekBar(min,max,cur);
 	}
 
 	private void initSeekBar(int min,int max,int cur){
@@ -378,7 +430,7 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 		// 取消传感器监听
 		cameraView.unRegisterSensor();
 		super.onPause();
-	};
+	}
 
 	public void bindMenuListener() {
 		changeCamera.setOnClickListener(new OnClickListener() {
@@ -431,6 +483,9 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 			flash();
 
 		}
+		else if (i1 == R.id.iso_btn) {
+			isoSeekBarPopwindow.showPopupWindow(isoBtn);
+		}
 	}
 
 	private void flash(){
@@ -466,6 +521,12 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 	private void confirm(){
 //		ArrayList<String> temp = new ArrayList<>();listImage
 //		removeImageDelete(temp);
+		if(imageCallback != null){
+			imageCallback.setImagePaths(listImage);
+		}
+		Intent data = new Intent();
+		data.putExtra(PARAMS_IMAGE_LIST,listImage);
+		setResult(resultCode,data);
 		finish();
 	}
 
@@ -509,7 +570,7 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 					String cameraPath = pic_dir + filename;
 
 					//Bitmap bp = ImageUtils.Bytes2Bimap(CameraActivity.this.data);
-					Bitmap bp = CameraUtils.getSmallBitmap(CameraActivity.this.data, 1440, 2560);
+					Bitmap bp = CameraUtils.getSmallBitmap(CameraActivity.this.data, IMAGE_WIDTH, IMAGE_HEIGHT);
 					Bitmap bp_degre = null;
 					if(CameraActivity.this.cameraNum == 1){//前置摄像头
 						CameraActivity.this.degree += 180;
@@ -518,7 +579,7 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 						}
 					}
 
-					bp_degre = CameraUtils.scalingImageView(CameraActivity.this.degree, 2560,1440,bp);
+					bp_degre = CameraUtils.scalingImageView(CameraActivity.this.degree, IMAGE_WIDTH,IMAGE_HEIGHT,bp);
 					//bp_degre = ImageUtils.rotaingImageView(CameraActivity.this.degree, bp);
 					//boolean bo = ImageUtils.saveBitmapToFile(bp_withWord, cameraPath);
 					int quality = 95;
@@ -541,8 +602,6 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 				}
 			});
 		}
-
-
 
 		//takepicture.setEnabled(true);
 	}

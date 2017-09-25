@@ -20,62 +20,13 @@
         
         <!-- 相对布局，放置两个按钮 -->
 
-        <RelativeLayout
-            android:id="@+id/buttonLayout"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="@android:color/black"
-            android:paddingBottom="10dp" >
-
-            <!-- 取消按钮 -->
-
-            <Button
-                android:id="@+id/cancel"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="30dp"
-                android:background="@android:color/transparent"
-                android:onClick="btnOnclick"
-                android:text="取消"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
-            <!-- 拍照按钮 -->
-
-            <Button
-                android:id="@+id/takepicture"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_centerInParent="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/selector_btn_camera"
-                android:onClick="btnOnclick" />
-
-            <!-- 确定按钮 -->
-
-            <Button
-                android:id="@+id/confirm"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="30dp"
-                android:background="@android:color/transparent"
-                android:onClick="btnOnclick"
-                android:text="确定"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
-        </RelativeLayout>
-
-        <ScrollView
+    <ScrollView
             android:id="@+id/gallery_images"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_alignParentLeft="true"
             android:layout_marginBottom="10dp"
-            android:layout_below="@+id/flash"
+            android:layout_below="@+id/top_layout"
             android:layout_above="@+id/buttonLayout" 
             android:visibility="gone">
 
@@ -95,7 +46,7 @@
             android:layout_height="fill_parent"
             android:layout_alignParentLeft="true"
             android:layout_marginBottom="10dp"
-            android:layout_below="@+id/flash"
+            android:layout_below="@+id/top_layout"
             android:layout_above="@+id/buttonLayout"
             android:cacheColorHint="#00000000"
             android:listSelector="@android:color/transparent"
@@ -104,38 +55,60 @@
             />
         <!-- 拍照模式按钮 -->
 
+    <RelativeLayout
+        android:id="@+id/top_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="45dp"
+        android:background="@color/half_transparent"
+        android:paddingBottom="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
         <Button
             android:id="@+id/flash"
-            android:layout_width="55dp"
-            android:layout_height="50dp"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="10dip"
             android:layout_marginTop="10dp"
             android:background="@drawable/icon_flash_off_holo_light" />
 
         <Button
+            android:id="@+id/iso_btn"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_toRightOf="@+id/flash"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="15dp"
+            android:background="@drawable/selector_btn_iso"/>
+
+        <Button
             android:id="@+id/singlepicture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/selector_btn_camera_change" />
+
+    </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/seek_bar_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/singlepicture"
+        android:layout_below="@+id/top_layout"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:visibility="gone">
         <ImageView
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:textSize="13sp"
-            android:src="@drawable/icon_bright"/>
+            android:src="@drawable/icon_bright_pressed"/>
 
         <com.cheguo.camera.view.MLVerticalSeekBar
             android:id="@+id/seek_bar"
@@ -146,6 +119,7 @@
             android:paddingRight="20dp"
             android:progressDrawable="@color/color_seekbar"
             android:thumb="@drawable/thumb" />
+
         <ImageView
             android:layout_width="16dp"
             android:layout_height="16dp"
@@ -153,5 +127,56 @@
             android:src="@drawable/icon_bright"/>
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/black"
+        android:paddingBottom="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+        <!-- 取消按钮 -->
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="30dp"
+            android:background="@android:color/transparent"
+            android:onClick="btnOnclick"
+            android:text="取消"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+        <!-- 拍照按钮 -->
+
+        <Button
+            android:id="@+id/takepicture"
+            android:layout_width="52dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:padding="5dp"
+            android:background="@drawable/selector_btn_camera"
+            android:onClick="btnOnclick" />
+
+        <!-- 确定按钮 -->
+
+        <Button
+            android:id="@+id/confirm"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="30dp"
+            android:background="@android:color/transparent"
+            android:onClick="btnOnclick"
+            android:text="确定"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+    </RelativeLayout>
 
 </RelativeLayout>

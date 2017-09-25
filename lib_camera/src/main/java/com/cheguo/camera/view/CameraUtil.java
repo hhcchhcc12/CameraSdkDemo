@@ -15,7 +15,7 @@ import android.view.Surface;
 import java.util.List;
 
 public class CameraUtil {
-	
+
     public static int getDisplayRotation(Activity activity) {
         int rotation = activity.getWindowManager().getDefaultDisplay()
                 .getRotation();
