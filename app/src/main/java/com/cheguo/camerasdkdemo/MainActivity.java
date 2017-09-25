@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements CameraActivity.Im
 //                Intent intent = new Intent(MainActivity.this, CameraActivity.class);
 //                intent.putExtra("test","test");
 //                startActivity(intent);
-                CameraActivity.launch(MainActivity.this, 1440, 2560, resultCode,MainActivity.this);
+                CameraActivity.launch(MainActivity.this, 1600, 2560, resultCode,MainActivity.this);
 //                Intent intent = new Intent(MainActivity.this,CameraActivity.class);
 //                intent.putExtra(CameraUtil.PARAMS_IMAGE_WIDTH,1440);
 //                intent.putExtra(CameraUtil.PARAMS_IMAGE_HEIGHT,2560);

@@ -333,8 +333,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback,
 				fitSize = biggestSize;
 			}
 
-			parametes.setPictureSize(fitSize.width, fitSize.height);
-			//parametes.setPictureSize(fitSize.height, fitSize.width);
+			//parametes.setPictureSize(fitSize.width, fitSize.height);
+			parametes.setPictureSize(biggestSize.width, biggestSize.height);
 		}
 	}
 
@@ -380,10 +380,10 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback,
 
 			parameters.setPictureFormat(ImageFormat.JPEG); // 设置图片格式  
 			parameters.setJpegQuality(100); // 设置照片质量
-			parameters.setPictureSize(size.width,size.height);
-			parameters.setPreviewSize(size_pre.width, size_pre.height); // 设置预览大小
-//			setPreviewSize(parameters);
-//			setPictureSize(parameters);
+//			parameters.setPictureSize(size.width,size.height);
+//			parameters.setPreviewSize(size_pre.width, size_pre.height); // 设置预览大小
+			setPreviewSize(parameters);
+			setPictureSize(parameters);
 
 //			if(degree == 0 || degree == 180){
 //				//parameters.setPictureSize(size.height,size.width);

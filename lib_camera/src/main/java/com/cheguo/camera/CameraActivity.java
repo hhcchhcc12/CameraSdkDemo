@@ -579,7 +579,7 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 						}
 					}
 
-					bp_degre = CameraUtils.scalingImageView(CameraActivity.this.degree, IMAGE_WIDTH,IMAGE_HEIGHT,bp);
+					bp_degre = CameraUtils.scalingImageView(CameraActivity.this.degree, IMAGE_HEIGHT,IMAGE_WIDTH,bp);
 					//bp_degre = ImageUtils.rotaingImageView(CameraActivity.this.degree, bp);
 					//boolean bo = ImageUtils.saveBitmapToFile(bp_withWord, cameraPath);
 					int quality = 95;
