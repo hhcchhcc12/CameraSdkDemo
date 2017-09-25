@@ -380,8 +380,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback,
 
 			parameters.setPictureFormat(ImageFormat.JPEG); // 设置图片格式  
 			parameters.setJpegQuality(100); // 设置照片质量
-//			parameters.setPictureSize(size.width,size.height);
-//			parameters.setPreviewSize(size_pre.width, size_pre.height); // 设置预览大小
+			//parameters.setPictureSize(size.width,size.height);
+			//parameters.setPreviewSize(size_pre.width, size_pre.height); // 设置预览大小
 			setPreviewSize(parameters);
 			setPictureSize(parameters);
 

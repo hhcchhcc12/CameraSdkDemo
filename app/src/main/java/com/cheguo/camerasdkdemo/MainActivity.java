@@ -25,15 +25,7 @@ public class MainActivity extends AppCompatActivity implements CameraActivity.Im
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(MainActivity.this, CameraActivity.class);
-//                intent.putExtra("test","test");
-//                startActivity(intent);
                 CameraActivity.launch(MainActivity.this, 1600, 2560, resultCode,MainActivity.this);
-//                Intent intent = new Intent(MainActivity.this,CameraActivity.class);
-//                intent.putExtra(CameraUtil.PARAMS_IMAGE_WIDTH,1440);
-//                intent.putExtra(CameraUtil.PARAMS_IMAGE_HEIGHT,2560);
-//                intent.putExtra(CameraUtil.PARAMS_RESULTCODE,1);
-//                startActivityForResult(intent,1);
             }
         });
     }

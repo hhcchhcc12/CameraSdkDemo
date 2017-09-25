@@ -29,7 +29,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
 import com.cheguo.camera.helper.PermissionUtils;
-import com.cheguo.camera.view.CameraUtil;
 import com.cheguo.camera.view.CameraView;
 import com.cheguo.camera.view.FocusImageView;
 import com.cheguo.camera.view.ICamera;
