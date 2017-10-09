@@ -55,6 +55,8 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback,
 	List<Size> prelist ;
 	Size size ;
 	Size size_pre ;
+	private final int  DEFAULT_WIDTH = 2160;
+	private int widthIn = DEFAULT_WIDTH;
 
 	public CameraView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -178,25 +180,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback,
 
 	}
 
-	private void initCamera(){
-		try {
-			camera = Camera.open(cameraPosition); // 打开摄像头
-			if(camera != null){
-				// 设置holder主要是用于surfaceView的图片的实时预览，以及获取图片等功能
-				camera.setPreviewDisplay(holder);
-				//parameters = camera.getParameters();
-				initSize();
-				initCameraParams();
-				camera.stopPreview();
-				camera.startPreview(); // 开始预览
-				camera.autoFocus(autoFocusCallback);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			//icamera.cameraError(e);
-		}
-	}
-
 	public void startCamera(boolean isCancelCamera){
 		try {
 			if(isCancelCamera && camera != null){
@@ -224,24 +207,9 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback,
 		piclist = parameters.getSupportedPictureSizes();
 		prelist = parameters.getSupportedPreviewSizes();
 		boolean isScreenHorizontal = isScreenHorizontal();
-		int width = 2160;
-//		if(isScreenHorizontal){
-//			width = 2560;
-//		}
-//		boolean suppSize = false;
+		int width = widthIn;
 		size_pre = MyCamPara.getInstance(context).getPreviewSize(prelist, width,isScreenHorizontal);
-//		for(Size s : piclist){
-//			if(s.width == size_pre.width && s.height == size_pre.height){
-//				suppSize = true;
-//				break;
-//			}
-//		}
 		size = MyCamPara.getInstance(context).getPictureSize(piclist, width,isScreenHorizontal);
-//		if(!suppSize){
-//		}
-//		else{
-//			size = size_pre;
-//		}
 	}
 
 	/** 预览界面分辨率 */
@@ -338,6 +306,10 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback,
 		}
 	}
 
+	public void setCustomWidth(int width){
+		widthIn = width;
+	}
+
 	// 拍照状态变化时调用该方法
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
@@ -383,7 +355,11 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback,
 			//parameters.setPictureSize(size.width,size.height);
 			//parameters.setPreviewSize(size_pre.width, size_pre.height); // 设置预览大小
 			setPreviewSize(parameters);
-			setPictureSize(parameters);
+			if(widthIn > 0 && widthIn != DEFAULT_WIDTH){
+				parameters.setPictureSize(size.width,size.height);
+			}else {
+				setPictureSize(parameters);
+			}
 
 //			if(degree == 0 || degree == 180){
 //				//parameters.setPictureSize(size.height,size.width);
@@ -402,10 +378,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback,
 	private int getCustomExposureCompensation(int value){
 		int maxExposure = parameters.getMaxExposureCompensation();
 		int minExposure = parameters.getMinExposureCompensation();
-//		int currExposure = parameters.getExposureCompensation();
-//		Log.e(TAG, "maxExposure : " + maxExposure);
-//		Log.e(TAG, "minExposure : " + minExposure);
-//		Log.e(TAG, "currExposure : " + currExposure);
+		//int currExposure = parameters.getExposureCompensation();
 
 		if(value < minExposure  || value > maxExposure){
 			return 0;

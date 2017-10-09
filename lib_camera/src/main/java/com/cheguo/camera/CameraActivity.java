@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -42,7 +43,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-public class CameraActivity extends Activity implements OnClickListener,AdapterView.OnItemClickListener, ICamera {
+public class CameraActivity extends FragmentActivity implements OnClickListener,AdapterView.OnItemClickListener, ICamera {
 	private String TAG = "CameraActivity";
 	CameraView cameraView;
 	/** 触摸屏幕时显示的聚焦图案  */
@@ -126,6 +127,8 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 		//检查权限
 		//requestMorePermissions(this);
 
+
+
 	}
 
 	// 普通申请多个权限
@@ -135,6 +138,7 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 					@Override
 					public void onHasPermission() {
 						// 权限已被授予
+						//cameraView.startCamera(true,IMAGE_HEIGHT);
 						//initCamera();
 						//cameraErrorDone();
 					}
@@ -242,6 +246,8 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 			IMAGE_HEIGHT = getIntent().getIntExtra(PARAMS_IMAGE_HEIGHT,0) > 0 ?
 					getIntent().getIntExtra(PARAMS_IMAGE_HEIGHT,0) : DEFAULT_IMAGE_HEIGHT;
 		}
+		cameraView.setCustomWidth(IMAGE_HEIGHT);
+
 		resultCode = getIntent().getIntExtra(PARAMS_RESULTCODE,0);
 		imageCallback = (ImageCallback) getIntent().getSerializableExtra(PARAMS_CALLBACK);
 
@@ -444,11 +450,13 @@ public class CameraActivity extends Activity implements OnClickListener,AdapterV
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		// 进入浏览页面
-//		Intent intent = new Intent(this, PhotosViewPagerActivity.class);
-//		intent.setAction(Params.ACTION_IN_CAMERA);
-//		intent.putExtra(Params.PARAMS_IMAGE_LIST, listImage);
-//		intent.putExtra(Params.PARAMS_POSITION, position);
-//		startActivityForResult(intent, Params.REQUESTCODE_PHOTO_BROWSE);
+		PhotoFragment dialog = new PhotoFragment();
+		Bundle bundle = new Bundle();
+		String[] paths = new String[listImage.size()];
+		bundle.putStringArray(PhotoFragment.KEY_PHOTO_URL, listImage.toArray(paths));
+		bundle.putInt(PhotoFragment.KEY_POSITION,position);
+		dialog.setArguments(bundle);
+		dialog.show(getSupportFragmentManager(),PhotoFragment.class.getSimpleName());
 	}
 
 	@Override

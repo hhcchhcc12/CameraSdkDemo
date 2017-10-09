@@ -91,38 +91,4 @@ public class CameraUtil {
         return optimalSize;
     }
 
-//    public static void startCarmer(final Activity context, final Uri uri) {
-//        AlertDialog dialog =new AlertDialog.Builder(context).setItems(
-//                new String[]{"拍照", "相册"}, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        Intent intent;
-//                        switch (which) {
-//                            case 0:
-//                                intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-//                                context.startActivityForResult(intent, Params.REQUEST_FROM_CAMERA_CODE);
-//                                break;
-//                            case 1:
-//                                if (Build.VERSION.SDK_INT < 19) {
-//                                    intent = new Intent();
-//                                    intent.setAction(Intent.ACTION_GET_CONTENT);
-//                                    intent.setType("image/*");
-//                                    context.startActivityForResult(Intent.createChooser(intent, "选择图片"),
-//                                            Params.REQUEST_FROM_ALBUM_CODE);
-//                                } else {
-//                                    intent = new Intent(Intent.ACTION_PICK,
-//                                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                                    intent.setType("image/*");
-//                                    context.startActivityForResult(Intent.createChooser(intent, "选择图片"),
-//                                            Params.REQUEST_FROM_ALBUM_CODE);
-//                                }
-//                                break;
-//                        }
-//                    }
-//                }).create();
-//        dialog.setCanceledOnTouchOutside(false);
-//        dialog.show();
-//    }
-	
 }

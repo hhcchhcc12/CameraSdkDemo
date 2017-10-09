@@ -9,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.cheguo.camera.view.CameraUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class CameraPhotosAdapter extends BaseAdapter {
 				.error(R.drawable.bg_default_pic)
 				.into(viewHolder.photo);
 
-		viewHolder.icon.setVisibility(View.GONE);
+		viewHolder.icon.setVisibility(View.VISIBLE);
 		viewHolder.icon.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -78,6 +79,7 @@ public class CameraPhotosAdapter extends BaseAdapter {
 					boolean bo = file.delete();
 					if(bo){
 						imageList.remove(imagePath);
+						CameraUtils.deleteFile(imagePath);
 						notifyDataSetChanged();
 						//删除app数据库中图片信息
 //						int row = ImageDao.getInstance(context).deleteImageByPath(imagePath);

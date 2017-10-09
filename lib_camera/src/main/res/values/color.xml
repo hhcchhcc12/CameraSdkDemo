@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="color_seekbar">#00CCA3</color>
-    <color name="half_transparent">#50000000</color>
+    <color name="camera_half_transparent">#50000000</color>
+    <color name="camera_semi_transparent">#22ffffff</color><!-- 半透明 -->
+    <color name="camera_black">#000000</color>
 </resources>
