@@ -107,6 +107,22 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 	// 打开相机请求Code，多个权限请求Code
 	private final int REQUEST_CODE_PERMISSIONS=1;
 
+	public static void launch(Activity context,int resultCode,ImageCallback imageCallback){
+		Intent intent = new Intent(context,CameraActivity.class);
+		intent.putExtra(PARAMS_RESULTCODE,resultCode);
+		intent.putExtra(PARAMS_CALLBACK,imageCallback);
+		context.startActivityForResult(intent,resultCode);
+	}
+
+	public static void launch(Activity context,int width,int height,int resultCode,ImageCallback imageCallback){
+		Intent intent = new Intent(context,CameraActivity.class);
+		intent.putExtra(PARAMS_IMAGE_WIDTH,width);
+		intent.putExtra(PARAMS_IMAGE_HEIGHT,height);
+		intent.putExtra(PARAMS_RESULTCODE,resultCode);
+		intent.putExtra(PARAMS_CALLBACK,imageCallback);
+		context.startActivityForResult(intent,resultCode);
+	}
+
 	public static void launch(Activity context,int width,int height,String pic_dir,int resultCode,ImageCallback imageCallback){
 		Intent intent = new Intent(context,CameraActivity.class);
 		intent.putExtra(PARAMS_IMAGE_WIDTH,width);
@@ -115,7 +131,6 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 		intent.putExtra(PARAMS_RESULTCODE,resultCode);
 		intent.putExtra(PARAMS_CALLBACK,imageCallback);
 		context.startActivityForResult(intent,resultCode);
-
 	}
 
 	public interface ImageCallback extends Serializable {
