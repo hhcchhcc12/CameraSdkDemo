@@ -66,7 +66,7 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 
 	ExecutorService fixedThreadPool;
 
-	private final String IMAGE_FOLDER = "/my_camera";//图片文件夹
+	private final String IMAGE_FOLDER = "/DIMC";//图片文件夹
 
 	SeekBar zoomBar;
 	LinearLayout zoomBarLayout;
@@ -87,12 +87,15 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 	public final static String PARAMS_IMAGE_HEIGHT = "PARAMS_IMAGE_HEIGHT";
 	public final static String PARAMS_CALLBACK = "PARAMS_CALLBACK";
 	public final static String PARAMS_RESULTCODE = "PARAMS_RESULTCODE";
+	public final static String PARAMS_PIC_DIR = "PARAMS_PIC_DIR";
 
 	private final int DEFAULT_IMAGE_WIDTH = 1440;
 	private final int DEFAULT_IMAGE_HEIGHT = 2560;
 
 	private int IMAGE_WIDTH = DEFAULT_IMAGE_WIDTH;
 	private int IMAGE_HEIGHT = DEFAULT_IMAGE_HEIGHT;
+
+	private String pic_dir;
 
 	private int resultCode;
 	private ImageCallback imageCallback;
@@ -104,10 +107,11 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 	// 打开相机请求Code，多个权限请求Code
 	private final int REQUEST_CODE_PERMISSIONS=1;
 
-	public static void launch(Activity context,int width,int height,int resultCode,ImageCallback imageCallback){
+	public static void launch(Activity context,int width,int height,String pic_dir,int resultCode,ImageCallback imageCallback){
 		Intent intent = new Intent(context,CameraActivity.class);
 		intent.putExtra(PARAMS_IMAGE_WIDTH,width);
 		intent.putExtra(PARAMS_IMAGE_HEIGHT,height);
+		intent.putExtra(PARAMS_PIC_DIR,pic_dir);
 		intent.putExtra(PARAMS_RESULTCODE,resultCode);
 		intent.putExtra(PARAMS_CALLBACK,imageCallback);
 		context.startActivityForResult(intent,resultCode);
@@ -250,6 +254,13 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 
 		resultCode = getIntent().getIntExtra(PARAMS_RESULTCODE,0);
 		imageCallback = (ImageCallback) getIntent().getSerializableExtra(PARAMS_CALLBACK);
+
+		//照片保存地址
+		pic_dir = getIntent().getStringExtra(PARAMS_PIC_DIR);
+		if(TextUtils.isEmpty(pic_dir)){
+			pic_dir = CameraUtils.getSDCardAbsolutePath() +
+					CameraUtils.getAppProcessName(CameraActivity.this) + IMAGE_FOLDER + "/";
+		}
 
 		if (savedInstanceState != null
 				&& savedInstanceState.getStringArrayList("path_list") != null){
@@ -567,14 +578,13 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 				public void run() {
 					long time = System.currentTimeMillis();
 					String filename = CameraUtils.FormatTimeForm(time,"yyyy-MM-dd HH:mm:ss") + ".jpg";
-					//+ ".jpg";
 
-					String packageName = CameraUtils.getAppProcessName(CameraActivity.this);
-
-					String pic_root = CameraUtils.getSDCardAbsolutePath() + packageName;
-					String pic_dir = pic_root + IMAGE_FOLDER + "/";
+//					String packageName = CameraUtils.getAppProcessName(CameraActivity.this);
+//					String pic_root = CameraUtils.getSDCardAbsolutePath() + packageName;
+//					String pic_dir = pic_root + IMAGE_FOLDER + "/";
 
 					String cameraPath = pic_dir + filename;
+					Log.e("CameraActivity", "cameraPath : "+cameraPath);
 
 					//Bitmap bp = ImageUtils.Bytes2Bimap(CameraActivity.this.data);
 					Bitmap bp = CameraUtils.getSmallBitmap(CameraActivity.this.data, IMAGE_WIDTH, IMAGE_HEIGHT);

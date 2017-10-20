@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.cheguo.camera.CameraActivity;
+import com.cheguo.camera.CameraUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,9 @@ public class MainActivity extends AppCompatActivity implements CameraActivity.Im
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CameraActivity.launch(MainActivity.this, 1080, 1920, resultCode,MainActivity.this);
+                String pic_dir = CameraUtils.getSDCardAbsolutePath() +
+                        CameraUtils.getAppProcessName(MainActivity.this) + "/test" + "/";
+                CameraActivity.launch(MainActivity.this, 1080, 1920,pic_dir, resultCode,MainActivity.this);
             }
         });
     }
