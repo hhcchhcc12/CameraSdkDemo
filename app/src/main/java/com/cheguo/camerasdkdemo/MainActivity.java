@@ -9,6 +9,7 @@ import android.widget.Button;
 
 import com.cheguo.camera.CameraActivity;
 import com.cheguo.camera.CameraUtils;
+import com.cheguo.camera.helper.PhotoParamsEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,14 @@ public class MainActivity extends AppCompatActivity implements CameraActivity.Im
             @Override
             public void onClick(View view) {
                 String pic_dir = CameraUtils.getSDCardAbsolutePath() +
-                        CameraUtils.getAppProcessName(MainActivity.this) + "/test" + "/";
-                CameraActivity.launch(MainActivity.this, 1080, 1920,pic_dir, resultCode,MainActivity.this);
+                        CameraUtils.getAppProcessName(MainActivity.this) + "/newTest" + "/";
+
+                PhotoParamsEntity entity = new PhotoParamsEntity();
+                entity.width = 720;
+                entity.height = 960;
+                entity.picDir = pic_dir;
+
+                CameraActivity.launch(MainActivity.this, entity, resultCode,MainActivity.this);
             }
         });
     }

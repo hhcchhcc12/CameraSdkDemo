@@ -30,6 +30,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
 import com.cheguo.camera.helper.PermissionUtils;
+import com.cheguo.camera.helper.PhotoParamsEntity;
 import com.cheguo.camera.view.CameraView;
 import com.cheguo.camera.view.FocusImageView;
 import com.cheguo.camera.view.ICamera;
@@ -89,6 +90,8 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 	public final static String PARAMS_RESULTCODE = "PARAMS_RESULTCODE";
 	public final static String PARAMS_PIC_DIR = "PARAMS_PIC_DIR";
 
+	public final static String PARAMS_PIC_PARAMS_ENTITY = "PARAMS_PIC_PARAMS_ENTITY";
+
 	private final int DEFAULT_IMAGE_WIDTH = 1440;
 	private final int DEFAULT_IMAGE_HEIGHT = 2560;
 
@@ -96,6 +99,8 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 	private int IMAGE_HEIGHT = DEFAULT_IMAGE_HEIGHT;
 
 	private String pic_dir;
+
+	private PhotoParamsEntity paramsEntity;
 
 	private int resultCode;
 	private ImageCallback imageCallback;
@@ -114,20 +119,28 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 		context.startActivityForResult(intent,resultCode);
 	}
 
-	public static void launch(Activity context,int width,int height,int resultCode,ImageCallback imageCallback){
-		Intent intent = new Intent(context,CameraActivity.class);
-		intent.putExtra(PARAMS_IMAGE_WIDTH,width);
-		intent.putExtra(PARAMS_IMAGE_HEIGHT,height);
-		intent.putExtra(PARAMS_RESULTCODE,resultCode);
-		intent.putExtra(PARAMS_CALLBACK,imageCallback);
-		context.startActivityForResult(intent,resultCode);
-	}
+//	public static void launch(Activity context,int width,int height,int resultCode,ImageCallback imageCallback){
+//		Intent intent = new Intent(context,CameraActivity.class);
+//		intent.putExtra(PARAMS_IMAGE_WIDTH,width);
+//		intent.putExtra(PARAMS_IMAGE_HEIGHT,height);
+//		intent.putExtra(PARAMS_RESULTCODE,resultCode);
+//		intent.putExtra(PARAMS_CALLBACK,imageCallback);
+//		context.startActivityForResult(intent,resultCode);
+//	}
+//
+//	public static void launch(Activity context,int width,int height,String pic_dir,int resultCode,ImageCallback imageCallback){
+//		Intent intent = new Intent(context,CameraActivity.class);
+//		intent.putExtra(PARAMS_IMAGE_WIDTH,width);
+//		intent.putExtra(PARAMS_IMAGE_HEIGHT,height);
+//		intent.putExtra(PARAMS_PIC_DIR,pic_dir);
+//		intent.putExtra(PARAMS_RESULTCODE,resultCode);
+//		intent.putExtra(PARAMS_CALLBACK,imageCallback);
+//		context.startActivityForResult(intent,resultCode);
+//	}
 
-	public static void launch(Activity context,int width,int height,String pic_dir,int resultCode,ImageCallback imageCallback){
+	public static void launch(Activity context, PhotoParamsEntity paramsEntity, int resultCode, ImageCallback imageCallback){
 		Intent intent = new Intent(context,CameraActivity.class);
-		intent.putExtra(PARAMS_IMAGE_WIDTH,width);
-		intent.putExtra(PARAMS_IMAGE_HEIGHT,height);
-		intent.putExtra(PARAMS_PIC_DIR,pic_dir);
+		intent.putExtra(PARAMS_PIC_PARAMS_ENTITY,paramsEntity);
 		intent.putExtra(PARAMS_RESULTCODE,resultCode);
 		intent.putExtra(PARAMS_CALLBACK,imageCallback);
 		context.startActivityForResult(intent,resultCode);
@@ -257,21 +270,35 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 	private void initData(Bundle savedInstanceState){
 		fixedThreadPool = Executors.newFixedThreadPool(1);
 		imageType = getIntent().getStringExtra(PARAMS_IMAGE_TYPE);
-		if(getIntent().hasExtra(PARAMS_IMAGE_WIDTH)){
-			IMAGE_WIDTH = getIntent().getIntExtra(PARAMS_IMAGE_WIDTH,0) > 0 ?
-					getIntent().getIntExtra(PARAMS_IMAGE_WIDTH,0) : DEFAULT_IMAGE_WIDTH;
+		paramsEntity = (PhotoParamsEntity) getIntent().getSerializableExtra(PARAMS_PIC_PARAMS_ENTITY);
+//		if(getIntent().hasExtra(PARAMS_IMAGE_WIDTH)){
+//			IMAGE_WIDTH = getIntent().getIntExtra(PARAMS_IMAGE_WIDTH,0) > 0 ?
+//					getIntent().getIntExtra(PARAMS_IMAGE_WIDTH,0) : DEFAULT_IMAGE_WIDTH;
+//		}
+//		if(getIntent().hasExtra(PARAMS_IMAGE_WIDTH)){
+//			IMAGE_HEIGHT = getIntent().getIntExtra(PARAMS_IMAGE_HEIGHT,0) > 0 ?
+//					getIntent().getIntExtra(PARAMS_IMAGE_HEIGHT,0) : DEFAULT_IMAGE_HEIGHT;
+//		}
+		if(paramsEntity != null){
+			IMAGE_WIDTH = paramsEntity.width > 0 ? paramsEntity.width : DEFAULT_IMAGE_WIDTH;
+			IMAGE_HEIGHT = paramsEntity.height > 0 ? paramsEntity.height : DEFAULT_IMAGE_HEIGHT;
+			//照片保存地址
+			if(!TextUtils.isEmpty(paramsEntity.picDir)){
+				pic_dir = paramsEntity.picDir;
+			}
 		}
-		if(getIntent().hasExtra(PARAMS_IMAGE_WIDTH)){
+		else{
+			IMAGE_WIDTH = getIntent().getIntExtra(PARAMS_IMAGE_WIDTH,0) > 0 ?
+				getIntent().getIntExtra(PARAMS_IMAGE_WIDTH,0) : DEFAULT_IMAGE_WIDTH;
 			IMAGE_HEIGHT = getIntent().getIntExtra(PARAMS_IMAGE_HEIGHT,0) > 0 ?
-					getIntent().getIntExtra(PARAMS_IMAGE_HEIGHT,0) : DEFAULT_IMAGE_HEIGHT;
+				getIntent().getIntExtra(PARAMS_IMAGE_HEIGHT,0) : DEFAULT_IMAGE_HEIGHT;
 		}
 		cameraView.setCustomWidth(IMAGE_HEIGHT);
 
 		resultCode = getIntent().getIntExtra(PARAMS_RESULTCODE,0);
 		imageCallback = (ImageCallback) getIntent().getSerializableExtra(PARAMS_CALLBACK);
 
-		//照片保存地址
-		pic_dir = getIntent().getStringExtra(PARAMS_PIC_DIR);
+		//设置默认照片保存地址
 		if(TextUtils.isEmpty(pic_dir)){
 			pic_dir = CameraUtils.getSDCardAbsolutePath() +
 					CameraUtils.getAppProcessName(CameraActivity.this) + IMAGE_FOLDER + "/";
