@@ -1,5 +1,6 @@
 package com.cheguo.camera;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
@@ -13,6 +14,8 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.cheguo.camera.view.CustomViewPager;
 
+import java.io.Serializable;
+
 import uk.co.senab.photoview.PhotoView;
 
 /**
@@ -24,15 +27,21 @@ public class PhotoFragment extends BaseDialogFragment {
 
     public static final String KEY_PHOTO_URL = "KEY_PHOTO_URL";
     public static final String KEY_POSITION = "KEY_POSITION";
+    public static final String KEY_PHOTOLOAD = "KEY_PHOTOLOAD";
 
     ImageView titleBarLeftIv;
     CustomViewPager photosViewpager;
 
     private String[] photoUrls;
     private int startPosition;
+    private IPhotoLoad load;
 
     public PhotoFragment() {
         super();
+    }
+
+    public void setLoad(IPhotoLoad load) {
+        this.load = load;
     }
 
     @Nullable
@@ -64,6 +73,7 @@ public class PhotoFragment extends BaseDialogFragment {
     private void initData() {
         photoUrls = getArguments().getStringArray(KEY_PHOTO_URL);
         startPosition = getArguments().getInt(KEY_POSITION);
+        load = (IPhotoLoad) getArguments().getSerializable(KEY_PHOTOLOAD);
 
     }
 
@@ -93,11 +103,12 @@ public class PhotoFragment extends BaseDialogFragment {
         public View instantiateItem(ViewGroup container, final int position) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.view_photo_viewpager_item_layout, null);
             PhotoView photoView = (PhotoView) view.findViewById(R.id.photo_view);
-            if (!TextUtils.isEmpty(photoUrls[position])) {
-                Glide.with(PhotoFragment.this).load(photoUrls[position])
-                        .placeholder(R.drawable.bg_default_pic)   // 加载过程中的占位Drawable
-                        .error(R.drawable.bg_default_pic)
-                        .into(photoView);
+            if (!TextUtils.isEmpty(photoUrls[position]) && load != null) {
+                load.loadImage(getActivity(),photoView,photoUrls[position]);
+//                Glide.with(PhotoFragment.this).load(photoUrls[position])
+//                        .placeholder(R.drawable.bg_default_pic)   // 加载过程中的占位Drawable
+//                        .error(R.drawable.bg_default_pic)
+//                        .into(photoView);
             }
             container.addView(view);
             return view;
@@ -113,6 +124,10 @@ public class PhotoFragment extends BaseDialogFragment {
             return view == object;
         }
 
+    }
+
+    public interface IPhotoLoad extends Serializable {
+        void loadImage(Activity context, ImageView photo, String imagePath);
     }
 
 }

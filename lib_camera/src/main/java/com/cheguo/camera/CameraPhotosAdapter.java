@@ -12,12 +12,14 @@ import com.bumptech.glide.Glide;
 import com.cheguo.camera.view.CameraUtil;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class CameraPhotosAdapter extends BaseAdapter {
 
 	private ArrayList<String> imageList;
 	private Activity context;
+	private IPhotoLoad load;
 
 	public CameraPhotosAdapter() {
 	}
@@ -31,6 +33,10 @@ public class CameraPhotosAdapter extends BaseAdapter {
 		this.imageList = imageList;
 		notifyDataSetChanged();
 
+	}
+
+	public void setLoad(IPhotoLoad load) {
+		this.load = load;
 	}
 
 	@Override
@@ -64,10 +70,13 @@ public class CameraPhotosAdapter extends BaseAdapter {
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
 
-		Glide.with(context).load(imagePath)
-				.placeholder(R.drawable.bg_default_pic)   // 加载过程中的占位Drawable
-				.error(R.drawable.bg_default_pic)
-				.into(viewHolder.photo);
+//		Glide.with(context).load(imagePath)
+//				.placeholder(R.drawable.bg_default_pic)   // 加载过程中的占位Drawable
+//				.error(R.drawable.bg_default_pic)
+//				.into(viewHolder.photo);
+		if(load != null){
+			load.loadImage(context,viewHolder.photo,imagePath);
+		}
 
 		viewHolder.icon.setVisibility(View.VISIBLE);
 		viewHolder.icon.setOnClickListener(new OnClickListener() {
@@ -101,6 +110,10 @@ public class CameraPhotosAdapter extends BaseAdapter {
 	class ViewHolder {
 		private ImageView photo;
 		private ImageView icon;
+	}
+
+	public interface IPhotoLoad extends Serializable{
+		void loadImage(Activity context,ImageView photo,String imagePath);
 	}
 
 }

@@ -101,6 +101,8 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 	private String pic_dir;
 
 	private PhotoParamsEntity paramsEntity;
+	private CameraPhotosAdapter.IPhotoLoad listLoad;
+	private PhotoFragment.IPhotoLoad viewPagerLoad;
 
 	private int resultCode;
 	private ImageCallback imageCallback;
@@ -286,6 +288,9 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 			if(!TextUtils.isEmpty(paramsEntity.picDir)){
 				pic_dir = paramsEntity.picDir;
 			}
+			listLoad = paramsEntity.listLoad;
+			viewPagerLoad = paramsEntity.viewPagerLoad;
+			adapter.setLoad(listLoad);
 		}
 		else{
 			IMAGE_WIDTH = getIntent().getIntExtra(PARAMS_IMAGE_WIDTH,0) > 0 ?
@@ -504,10 +509,12 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		// 进入浏览页面
 		PhotoFragment dialog = new PhotoFragment();
+		//dialog.setLoad(viewPagerLoad);
 		Bundle bundle = new Bundle();
 		String[] paths = new String[listImage.size()];
 		bundle.putStringArray(PhotoFragment.KEY_PHOTO_URL, listImage.toArray(paths));
 		bundle.putInt(PhotoFragment.KEY_POSITION,position);
+		bundle.putSerializable(PhotoFragment.KEY_PHOTOLOAD,viewPagerLoad);
 		dialog.setArguments(bundle);
 		dialog.show(getSupportFragmentManager(),PhotoFragment.class.getSimpleName());
 	}
