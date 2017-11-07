@@ -634,11 +634,10 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 				@Override
 				public void run() {
 					long time = System.currentTimeMillis();
-					String filename = CameraUtils.FormatTimeForm(time,"yyyy-MM-dd HH:mm:ss");
+					String filename = CameraUtils.FormatTimeForm(time,"IMAGE_yyyy-MM-dd HH:mm:ss");
 					if(isShowSuffixName){
 						filename += ".jpg";
 					}
-
 
 					String cameraPath = pic_dir + filename;
 					Log.e("CameraActivity", "cameraPath : "+cameraPath);
