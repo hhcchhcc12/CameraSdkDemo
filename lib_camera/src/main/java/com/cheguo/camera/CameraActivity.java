@@ -2,6 +2,7 @@ package com.cheguo.camera;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,6 +12,7 @@ import android.hardware.Camera.AutoFocusCallback;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
@@ -101,6 +103,9 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 	private String pic_dir;
 
 	private PhotoParamsEntity paramsEntity;
+	public int coverImage;//拍照页面覆盖层
+	public boolean isShowSuffixName;//照片是否添加后缀名
+	public boolean isSaveToAlbum;//照片是否保存到系统相册
 	private CameraPhotosAdapter.IPhotoLoad listLoad;
 	private PhotoFragment.IPhotoLoad viewPagerLoad;
 
@@ -288,6 +293,9 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 			if(!TextUtils.isEmpty(paramsEntity.picDir)){
 				pic_dir = paramsEntity.picDir;
 			}
+			coverImage = paramsEntity.coverImage;
+			isShowSuffixName = paramsEntity.isShowSuffixName;
+			isSaveToAlbum = paramsEntity.isSaveToAlbum;
 			listLoad = paramsEntity.listLoad;
 			viewPagerLoad = paramsEntity.viewPagerLoad;
 			adapter.setLoad(listLoad);
@@ -626,11 +634,11 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 				@Override
 				public void run() {
 					long time = System.currentTimeMillis();
-					String filename = CameraUtils.FormatTimeForm(time,"yyyy-MM-dd HH:mm:ss") + ".jpg";
+					String filename = CameraUtils.FormatTimeForm(time,"yyyy-MM-dd HH:mm:ss");
+					if(isShowSuffixName){
+						filename += ".jpg";
+					}
 
-//					String packageName = CameraUtils.getAppProcessName(CameraActivity.this);
-//					String pic_root = CameraUtils.getSDCardAbsolutePath() + packageName;
-//					String pic_dir = pic_root + IMAGE_FOLDER + "/";
 
 					String cameraPath = pic_dir + filename;
 					Log.e("CameraActivity", "cameraPath : "+cameraPath);
@@ -652,7 +660,11 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 					boolean bo = CameraUtils.saveBitmapToFile(bp_degre,pic_dir ,filename,quality);
 					if(bo){
 						Message msg = UIhandler.obtainMessage();
-						msg.obj = cameraPath;
+						Bundle msgData = new Bundle();
+						msgData.putString("image_path",cameraPath);
+						msgData.putString("image_name",filename);
+						msg.setData(msgData);
+						//msg.obj = cameraPath;
 						UIhandler.sendMessage(msg);
 					}
 					if (bp != null) {
@@ -674,13 +686,17 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 
 	Handler UIhandler = new Handler(){
 		public void handleMessage(android.os.Message msg) {
-			String imagePath = (String) msg.obj;
-			//getImageView(path);
+			Bundle msgData = msg.getData();
+			//String imagePath = (String) msg.obj;
+			String imagePath = msgData.getString("image_path");
+			String imageName = msgData.getString("image_name");
 
 			if(!TextUtils.isEmpty(imagePath)){
 				listPath.add(imagePath);
 				listImage.add(imagePath);
-
+				if(isShowSuffixName && isSaveToAlbum){
+					updataSysMedia(imagePath,imageName);
+				}
 				adapter.refresh(listImage);
 				int size = listImage.size();
 				if(size > 0){
@@ -689,6 +705,18 @@ public class CameraActivity extends FragmentActivity implements OnClickListener,
 			}
 		}
 	};
+
+	/**
+	 * save image into mediaDB
+	 * @param filePath
+	 * @param fileName
+     */
+	private void updataSysMedia(String filePath,String fileName){
+		ContentValues values = new ContentValues();
+		values.put(MediaStore.Images.Media.DATA, filePath);
+		values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+		getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+	}
 
 	Handler BtnHandler = new Handler(){
 		public void handleMessage(android.os.Message msg) {

@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements CameraActivity.Im
                 entity.picDir = pic_dir;
                 entity.listLoad = listLoad;
                 entity.viewPagerLoad = viewPageLoad;
+                entity.isShowSuffixName = true;
+                entity.isSaveToAlbum = true;
                 CameraActivity.launch(MainActivity.this, entity, resultCode,MainActivity.this);
             }
         });

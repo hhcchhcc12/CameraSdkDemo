@@ -8,9 +8,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.cheguo.camera.view.CameraUtil;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
